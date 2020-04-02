@@ -18,7 +18,7 @@ public:
             }
         } while (int(log10(end_number) + 1) > 1);
 
-        if (end_number == 1) {
+        if (end_number == 1 || end_number == 7) {
             output = true;
         }
 
@@ -28,7 +28,7 @@ public:
 
 int main() {
     Solution solution = Solution();
-    int num = 19;
+    int num = 1111111;
 
     int out = solution.isHappy(num);
 
