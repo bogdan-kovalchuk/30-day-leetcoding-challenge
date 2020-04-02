@@ -3,22 +3,27 @@
 #include <cmath>
 
 using std::vector;
-using std::map;
 
 class Solution {
 public:
-int isHappy(int n) {
-	int res = n;
-	while (int(log10(res) + 1) > 1){
-		int num = res;
-		res = 0;
-		while (num > 0){
-		    res += (num%10)^2;
-		    num /= 10;
-		}
+    bool isHappy(int n) {
+        bool output = false;
+        int end_number = n;
+        do {
+            int num = end_number;
+            end_number = 0;
+            while (num > 0) {
+                end_number += int(pow(num % 10, 2));
+                num /= 10;
+            }
+        } while (int(log10(end_number) + 1) > 1);
+
+        if (end_number == 1) {
+            output = true;
+        }
+
+        return output;
     }
-	return res;
-}
 };
 
 int main() {
