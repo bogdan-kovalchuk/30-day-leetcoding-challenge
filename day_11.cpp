@@ -7,7 +7,6 @@ using std::vector;
 using std::map;
 using std::pair;
 
-// Definition for a binary tree node.
 struct TreeNode {
     int val;
     TreeNode *left;
@@ -40,24 +39,23 @@ class Solution {
 public:
     int diameterOfBinaryTree(TreeNode *root) {
         int diameter = 0;
-        if (root->left != NULL) {
-            diameter += findLongestPath(root->left);
-        }
-        if (root->right != NULL) {
-            diameter += findLongestPath(root->right);
+        if (root != NULL){
+            findLongestPath(root, diameter);
         }
         return diameter;
     }
 
-    int findLongestPath(TreeNode *node) {
+    int findLongestPath(TreeNode *node, int &diameter) {
         int leftPath = 0, rightPath = 0;
         if (node->left != NULL) {
-            leftPath = findLongestPath(node->left);
+            leftPath = findLongestPath(node->left, diameter);
         }
         if (node->right != NULL) {
-            rightPath = findLongestPath(node->right);
+            rightPath = findLongestPath(node->right, diameter);
         }
-
+        if (leftPath + rightPath > diameter){
+            diameter = leftPath + rightPath;
+        }
         return ++(leftPath > rightPath ? leftPath: rightPath);
     }
 };
@@ -70,7 +68,6 @@ int main() {
 
     auto *root = new TreeNode(tree.begin()->first);
     for (const auto &elem: tree) {
-
         auto *target_root = TreeNode::findNode(root, elem.first);
         if (elem.second.first != 0) {
             target_root->left = new TreeNode(elem.second.first);
