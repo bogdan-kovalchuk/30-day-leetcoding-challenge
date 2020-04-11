@@ -15,20 +15,20 @@ struct TreeNode {
 
     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 
-    static TreeNode *findNode(TreeNode *node, int val){
+    static TreeNode *findNode(TreeNode *node, int val) {
         TreeNode *result = NULL;
         if (node->val == val) {
             result = node;
         }
-        if (node->left != NULL){
+        if (node->left != NULL) {
             auto *nodeLeft = findNode(node->left, val);
-            if (nodeLeft != NULL){
+            if (nodeLeft != NULL) {
                 result = nodeLeft;
             }
         }
-        if (node->right != NULL){
+        if (node->right != NULL) {
             auto *nodeRight = findNode(node->right, val);
-            if (nodeRight != NULL){
+            if (nodeRight != NULL) {
                 result = nodeRight;
             }
         }
@@ -39,22 +39,43 @@ struct TreeNode {
 class Solution {
 public:
     int diameterOfBinaryTree(TreeNode *root) {
+        int diameter = 0;
+        if (root->left != NULL) {
+            diameter += findLongestPath(root->left);
+        }
+        if (root->right != NULL) {
+            diameter += findLongestPath(root->right);
+        }
+        return diameter;
+    }
 
+    int findLongestPath(TreeNode *node) {
+        int leftPath = 0, rightPath = 0;
+        if (node->left != NULL) {
+            leftPath = findLongestPath(node->left);
+        }
+        if (node->right != NULL) {
+            rightPath = findLongestPath(node->right);
+        }
+
+        return ++(leftPath > rightPath ? leftPath: rightPath);
     }
 };
 
 int main() {
     Solution solution = Solution();
-    map<int, pair<int, int>> tree = {{1, {2, 3}}, {2, {4, 5}}};
+    map<int, pair<int, int>> tree = {{1, {2, 3}},
+                                     {2, {4, 5}},
+                                     {5, {6, 7}},};
 
     auto *root = new TreeNode(tree.begin()->first);
-    for (const auto& elem: tree) {
+    for (const auto &elem: tree) {
 
         auto *target_root = TreeNode::findNode(root, elem.first);
-        if (elem.second.first != 0){
+        if (elem.second.first != 0) {
             target_root->left = new TreeNode(elem.second.first);
         }
-        if (elem.second.second != 0){
+        if (elem.second.second != 0) {
             target_root->right = new TreeNode(elem.second.second);
         }
     }
