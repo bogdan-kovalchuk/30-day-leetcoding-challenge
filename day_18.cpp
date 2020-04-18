@@ -9,22 +9,20 @@ using std::string;
 class Solution {
 public:
     int minPathSum(vector<vector<int>> &grid) {
-        if (grid.empty()) return 0;
-        int min = INT_MAX;
-        cumulate_sum(grid, 0, 0, 0, min);
-        return min;
-    }
-
-    void cumulate_sum(const vector<vector<int>> &grid, int i, int j, int sum, int &min) {
-        if (i < grid.size() - 1) {
-            cumulate_sum(grid, i + 1, j, sum + grid[i][j], min);
+        int m = grid.size();
+        int n = grid[0].size();
+        for (int i = 1; i < n; ++i) {
+            grid[0][i] += grid[0][i - 1];
         }
-        if (j < grid[0].size() - 1) {
-            cumulate_sum(grid, i, j + 1, sum + grid[i][j], min);
+        for (int i = 1; i < m; ++i) {
+            grid[i][0] += grid[i - 1][0];
         }
-        if (i == grid.size() - 1 && j == grid[0].size() - 1 && sum + grid[i][j] < min) {
-            min = sum + grid[i][j];
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                grid[i][j] += std::min(grid[i - 1][j], grid[i][j - 1]);
+            }
         }
+        return grid[m - 1][n - 1];
     }
 };
 
@@ -34,6 +32,9 @@ int main() {
     vector<vector<int>> grid{{1, 3, 1},
                              {1, 5, 1},
                              {4, 2, 1}};
+
+//    vector<vector<int>> grid{{1, 2, 5},
+//                             {3, 2, 1}};
 
     std::cout << solution.minPathSum(grid) << std::endl;
 
