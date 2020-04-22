@@ -25,12 +25,12 @@ public:
         }
 
         for (int i = 0; i < sums.size(); ++i){
-            for (int j = i; j < size; ++j){
-
-
+            for (int j = i + 1; j < size; ++j){
+                tmp_sum = sums[j] - sums[i];
+                if (tmp_sum == k) ++subarray_sum_count;
             }
         }
-        return 0;
+        return subarray_sum_count;
     }
 };
 
