@@ -9,11 +9,13 @@ using std::string;
 class Solution {
 public:
     int rangeBitwiseAnd(int m, int n) {
-        int out = m;
-        for (int i = m; i <= n; i++) {
-            out = out & i;
+        u_int step = 1;
+        while (m != n) {
+            m /= 2;
+            n /= 2;
+            step *= 2;
         }
-        return out;
+        return step * m;
     }
 };
 
