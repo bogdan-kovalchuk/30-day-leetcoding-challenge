@@ -33,9 +33,10 @@ public:
         }
         return out;
     }
+
     bool checkValid(TreeNode *node, vector<int> &arr, int i) {
         bool left = false, right = false;
-        if (i < arr.size() - 1 && node->val == arr[i]){
+        if (i < arr.size() - 1 && node->val == arr[i]) {
             ++i;
             if (node->left != nullptr) left = checkValid(node->left, arr, i);
             if (node->right != nullptr) right = checkValid(node->right, arr, i);
