@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <string>
 
 using std::vector;
 using std::map;
@@ -53,15 +54,32 @@ int main() {
     Solution solution = Solution();
     SolutionXOR solutionXOR = SolutionXOR();
     SolutionSort solutionSort = SolutionSort();
+
     vector<int> nums = {2, 2, 5, 8, 9, 5, 1, 1, 9};
-    vector<int> numsCopy1(nums.begin(), nums.end());
-    vector<int> numsCopy2(nums.begin(), nums.end());
+    vector<int> edge1 = {1};
+    vector<int> edge2 = {-1, -1, -2};
+    vector<int> edge3 = {0, 0, 3};
 
-    int out = solution.singleNumber(nums);
-    int outXOR = solutionXOR.singleNumber(numsCopy1);
-    int outSort = solutionSort.singleNumber(numsCopy2);
+    auto runAll = [&](vector<int> v, const std::string &label) {
+        vector<int> c1(v.begin(), v.end());
+        vector<int> c2(v.begin(), v.end());
+        int r1 = solution.singleNumber(v);
+        int r2 = solutionXOR.singleNumber(c1);
+        int r3 = solutionSort.singleNumber(c2);
+        bool ok = (r1 == r2) && (r2 == r3);
+        std::cout << label << ": Map=" << r1 << " XOR=" << r2 << " Sort=" << r3
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
 
-    std::cout << "Map: " << out << " XOR: " << outXOR << " Sort: " << outSort << std::endl;
+    runAll(nums, "general");
+    runAll(edge1, "single element");
+    runAll(edge2, "all negative");
+    runAll(edge3, "with zero");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "Map:  O(n) time, O(n) space" << std::endl;
+    std::cout << "XOR:  O(n) time, O(1) space" << std::endl;
+    std::cout << "Sort: O(n log n) time, O(1) space" << std::endl;
 
     return 0;
 }
