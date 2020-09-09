@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <unordered_set>
+#include <string>
 
 using std::vector;
 
@@ -85,19 +86,33 @@ public:
 };
 
 int main() {
-    Solution solution = Solution();
-    SolutionFloyd solutionFloyd = SolutionFloyd();
-    SolutionSet solutionSet = SolutionSet();
-    SolutionPrecomputed solutionPrecomp = SolutionPrecomputed();
-    int num = 1111111;
+    Solution solution;
+    SolutionFloyd solutionFloyd;
+    SolutionSet solutionSet;
+    SolutionPrecomputed solutionPrecomp;
 
-    int out = solution.isHappy(num);
-    int outFloyd = solutionFloyd.isHappy(num);
-    int outSet = solutionSet.isHappy(num);
-    int outPrecomp = solutionPrecomp.isHappy(num);
+    auto runAll = [&](int n, const std::string &label) {
+        bool r1 = solution.isHappy(n);
+        bool r2 = solutionFloyd.isHappy(n);
+        bool r3 = solutionSet.isHappy(n);
+        bool r4 = solutionPrecomp.isHappy(n);
+        bool ok = (r1 == r2) && (r2 == r3) && (r3 == r4);
+        std::cout << label << ": Orig=" << r1 << " Floyd=" << r2
+                  << " Set=" << r3 << " Precomp=" << r4
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
 
-    std::cout << "Original: " << out << " Floyd: " << outFloyd
-              << " Set: " << outSet << " Precomp: " << outPrecomp << std::endl;
+    runAll(1, "n=1");
+    runAll(7, "n=7");
+    runAll(19, "n=19");
+    runAll(2, "n=2 (unhappy)");
+    runAll(1111111, "n=1111111");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "Original:  O(log n) per step, no explicit cycle tracking" << std::endl;
+    std::cout << "Floyd:     O(log n) per step, O(1) space" << std::endl;
+    std::cout << "Set:       O(log n) per step, O(log n) space for visited set" << std::endl;
+    std::cout << "Precomp:   O(log n) per step, O(1) space, early exit on known cycle" << std::endl;
 
     return 0;
 }
