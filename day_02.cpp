@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <unordered_set>
 
 using std::vector;
 
@@ -48,15 +49,35 @@ public:
     }
 };
 
+class SolutionSet {
+public:
+    bool isHappy(int n) {
+        std::unordered_set<int> seen;
+        while (n != 1 && seen.find(n) == seen.end()) {
+            seen.insert(n);
+            int sum = 0;
+            while (n > 0) {
+                int d = n % 10;
+                sum += d * d;
+                n /= 10;
+            }
+            n = sum;
+        }
+        return n == 1;
+    }
+};
+
 int main() {
     Solution solution = Solution();
     SolutionFloyd solutionFloyd = SolutionFloyd();
+    SolutionSet solutionSet = SolutionSet();
     int num = 1111111;
 
     int out = solution.isHappy(num);
     int outFloyd = solutionFloyd.isHappy(num);
+    int outSet = solutionSet.isHappy(num);
 
-    std::cout << "Original: " << out << " Floyd: " << outFloyd << std::endl;
+    std::cout << "Original: " << out << " Floyd: " << outFloyd << " Set: " << outSet << std::endl;
 
     return 0;
 }
