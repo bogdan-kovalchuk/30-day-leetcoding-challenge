@@ -67,17 +67,37 @@ public:
     }
 };
 
+class SolutionPrecomputed {
+public:
+    bool isHappy(int n) {
+        const std::unordered_set<int> cycle = {4, 16, 37, 58, 89, 145, 42, 20};
+        while (n != 1 && cycle.find(n) == cycle.end()) {
+            int sum = 0;
+            while (n > 0) {
+                int d = n % 10;
+                sum += d * d;
+                n /= 10;
+            }
+            n = sum;
+        }
+        return n == 1;
+    }
+};
+
 int main() {
     Solution solution = Solution();
     SolutionFloyd solutionFloyd = SolutionFloyd();
     SolutionSet solutionSet = SolutionSet();
+    SolutionPrecomputed solutionPrecomp = SolutionPrecomputed();
     int num = 1111111;
 
     int out = solution.isHappy(num);
     int outFloyd = solutionFloyd.isHappy(num);
     int outSet = solutionSet.isHappy(num);
+    int outPrecomp = solutionPrecomp.isHappy(num);
 
-    std::cout << "Original: " << out << " Floyd: " << outFloyd << " Set: " << outSet << std::endl;
+    std::cout << "Original: " << out << " Floyd: " << outFloyd
+              << " Set: " << outSet << " Precomp: " << outPrecomp << std::endl;
 
     return 0;
 }
