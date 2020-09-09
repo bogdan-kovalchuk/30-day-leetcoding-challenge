@@ -26,13 +26,37 @@ public:
     }
 };
 
+class SolutionFloyd {
+public:
+    int digitSquareSum(int n) {
+        int sum = 0;
+        while (n > 0) {
+            int d = n % 10;
+            sum += d * d;
+            n /= 10;
+        }
+        return sum;
+    }
+
+    bool isHappy(int n) {
+        int slow = n, fast = n;
+        do {
+            slow = digitSquareSum(slow);
+            fast = digitSquareSum(digitSquareSum(fast));
+        } while (slow != fast);
+        return slow == 1;
+    }
+};
+
 int main() {
     Solution solution = Solution();
+    SolutionFloyd solutionFloyd = SolutionFloyd();
     int num = 1111111;
 
     int out = solution.isHappy(num);
+    int outFloyd = solutionFloyd.isHappy(num);
 
-    std::cout << out << std::endl;
+    std::cout << "Original: " << out << " Floyd: " << outFloyd << std::endl;
 
     return 0;
 }
