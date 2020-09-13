@@ -3,6 +3,7 @@
 #include <numeric>
 #include <limits>
 #include <algorithm>
+#include <string>
 
 using std::vector;
 
@@ -75,18 +76,30 @@ private:
 };
 
 int main() {
-    Solution solution = Solution();
-    SolutionKadane solutionKadane = SolutionKadane();
-    SolutionDivideConquer solutionDC = SolutionDivideConquer();
-    vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+    Solution solution;
+    SolutionKadane solutionKadane;
+    SolutionDivideConquer solutionDC;
 
-    int out = solution.maxSubArray(nums);
-    vector<int> numsCopy1(nums.begin(), nums.end());
-    vector<int> numsCopy2(nums.begin(), nums.end());
-    int outKadane = solutionKadane.maxSubArray(numsCopy1);
-    int outDC = solutionDC.maxSubArray(numsCopy2);
+    auto runAll = [&](vector<int> v, const std::string &label) {
+        vector<int> c1(v), c2(v);
+        int r1 = solution.maxSubArray(v);
+        int r2 = solutionKadane.maxSubArray(c1);
+        int r3 = solutionDC.maxSubArray(c2);
+        bool ok = (r1 == r2) && (r2 == r3);
+        std::cout << label << ": Orig=" << r1 << " Kadane=" << r2 << " D&C=" << r3
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
 
-    std::cout << "Original: " << out << " Kadane: " << outKadane << " D&C: " << outDC << std::endl;
+    runAll({-2, 1, -3, 4, -1, 2, 1, -5, 4}, "general");
+    runAll({-3, -2, -5}, "all negative");
+    runAll({5}, "single element");
+    runAll({1, 2, 3}, "all positive");
+    runAll({-1, 0, -2}, "with zero");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "Original:  O(n^2) worst case, O(n) space for cumulative sums" << std::endl;
+    std::cout << "Kadane:    O(n) time, O(1) space" << std::endl;
+    std::cout << "D&C:       O(n log n) time, O(log n) stack space" << std::endl;
 
     return 0;
 }
