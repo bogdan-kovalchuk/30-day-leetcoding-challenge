@@ -3,6 +3,7 @@
 #include <numeric>
 #include <limits>
 #include <algorithm>
+#include <string>
 
 using std::vector;
 
@@ -62,15 +63,28 @@ int main() {
     Solution solution;
     SolutionOnePass solutionOnePass;
     SolutionStateMachine solutionSM;
-    vector<int> prices = {1, 2, 3, 4, 5};
 
-    int r1 = solution.maxProfit(prices);
-    vector<int> c(prices.begin(), prices.end());
-    int r2 = solutionOnePass.maxProfit(c);
-    vector<int> c2(prices.begin(), prices.end());
-    int r3 = solutionSM.maxProfit(c2);
+    auto runAll = [&](vector<int> v, const std::string &label) {
+        vector<int> c1(v), c2(v);
+        int r1 = solution.maxProfit(v);
+        int r2 = solutionOnePass.maxProfit(c1);
+        int r3 = solutionSM.maxProfit(c2);
+        bool ok = (r1 == r2) && (r2 == r3);
+        std::cout << label << ": VP=" << r1 << " OnePass=" << r2 << " SM=" << r3
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
 
-    std::cout << "ValleyPeak: " << r1 << " OnePass: " << r2 << " StateMachine: " << r3 << std::endl;
+    runAll({1, 2, 3, 4, 5}, "ascending");
+    runAll({5, 4, 3, 2, 1}, "descending");
+    runAll({7, 1, 5, 3, 6, 4}, "general");
+    runAll({}, "empty");
+    runAll({3}, "single");
+    runAll({1, 1, 1}, "flat");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "ValleyPeak:   O(n) time, O(1) space" << std::endl;
+    std::cout << "OnePass:      O(n) time, O(1) space, simpler logic" << std::endl;
+    std::cout << "StateMachine: O(n) time, O(1) space, extensible to k transactions" << std::endl;
 
     return 0;
 }
