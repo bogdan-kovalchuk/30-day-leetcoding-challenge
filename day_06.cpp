@@ -43,14 +43,27 @@ public:
 };
 
 int main() {
-    vector<string> array_of_strings = {"eat", "tea", "tan", "ate", "nat", "bat"};
-
     Solution solution;
     SolutionCountKey solutionCount;
-    auto r1 = solution.groupAnagrams(array_of_strings);
-    auto r2 = solutionCount.groupAnagrams(array_of_strings);
 
-    std::cout << "SortKey groups: " << r1.size() << " CountKey groups: " << r2.size() << std::endl;
+    auto runAll = [&](vector<string> v, const std::string &label) {
+        vector<string> c(v);
+        auto r1 = solution.groupAnagrams(v);
+        auto r2 = solutionCount.groupAnagrams(c);
+        bool ok = (r1.size() == r2.size());
+        std::cout << label << ": SortKey=" << r1.size() << " CountKey=" << r2.size()
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
+
+    runAll({"eat", "tea", "tan", "ate", "nat", "bat"}, "general");
+    runAll({""}, "single empty");
+    runAll({"a"}, "single char");
+    runAll({"", ""}, "two empties");
+    runAll({"abc", "bca", "cab", "xyz"}, "with non-anagram");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "SortKey:  O(n * k log k) time, O(nk) space" << std::endl;
+    std::cout << "CountKey: O(n * k) time, O(nk) space, k = max string length" << std::endl;
 
     return 0;
 }
