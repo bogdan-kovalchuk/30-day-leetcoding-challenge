@@ -26,15 +26,30 @@ public:
     }
 };
 
+class SolutionSingleMap {
+public:
+    int countElements(vector<int> &arr) {
+        std::unordered_map<int, int> freq;
+        for (int x : arr) freq[x]++;
+        int count = 0;
+        for (const auto &p : freq) {
+            if (freq.count(p.first + 1))
+                count += p.second;
+        }
+        return count;
+    }
+};
+
 int main() {
-    Solution solution = Solution();
+    Solution solution;
+    SolutionSingleMap solutionSingle;
     vector<int> nums = {1, 3, 2, 3, 5, 0};
-//    vector<int> nums = {1, 1, 2, 2};
-//    vector<int> nums = {1, 1, 2};
 
-    int count = solution.countElements(nums);
+    int r1 = solution.countElements(nums);
+    vector<int> c(nums);
+    int r2 = solutionSingle.countElements(c);
 
-    std::cout << count << std::endl;
+    std::cout << "TwoMap: " << r1 << " SingleMap: " << r2 << std::endl;
 
     return 0;
 }
