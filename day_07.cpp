@@ -3,6 +3,7 @@
 #include <numeric>
 #include <unordered_map>
 #include <algorithm>
+#include <string>
 
 using std::vector;
 
@@ -65,15 +66,28 @@ int main() {
     Solution solution;
     SolutionSingleMap solutionSingle;
     SolutionSort solutionSort;
-    vector<int> nums = {1, 3, 2, 3, 5, 0};
 
-    int r1 = solution.countElements(nums);
-    vector<int> c1(nums.begin(), nums.end());
-    int r2 = solutionSingle.countElements(c1);
-    vector<int> c2(nums.begin(), nums.end());
-    int r3 = solutionSort.countElements(c2);
+    auto runAll = [&](vector<int> v, const std::string &label) {
+        vector<int> c1(v), c2(v);
+        int r1 = solution.countElements(v);
+        int r2 = solutionSingle.countElements(c1);
+        int r3 = solutionSort.countElements(c2);
+        bool ok = (r1 == r2) && (r2 == r3);
+        std::cout << label << ": TwoMap=" << r1 << " SingleMap=" << r2 << " Sort=" << r3
+                  << (ok ? " OK" : " MISMATCH") << std::endl;
+    };
 
-    std::cout << "TwoMap: " << r1 << " SingleMap: " << r2 << " Sort: " << r3 << std::endl;
+    runAll({1, 3, 2, 3, 5, 0}, "general");
+    runAll({1, 1, 2, 2}, "duplicates with match");
+    runAll({1, 1, 2}, "duplicates partial");
+    runAll({}, "empty");
+    runAll({5}, "single element");
+    runAll({1, 3, 5, 7}, "no consecutive");
+
+    std::cout << "\nComplexity comparison:" << std::endl;
+    std::cout << "TwoMap:    O(n) time, O(n) space" << std::endl;
+    std::cout << "SingleMap: O(n) time, O(n) space, half the allocations" << std::endl;
+    std::cout << "Sort:      O(n log n) time, O(1) extra space" << std::endl;
 
     return 0;
 }
