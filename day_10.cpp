@@ -48,6 +48,27 @@ private:
     vector<std::pair<int,int>> stk;
 };
 
+// Auxiliary min-stack: main stack + separate min-stack.
+// min-stack only grows when a new min appears. Saves space when
+// minimums change infrequently.
+// push/pop/top/getMin all O(1). Space O(n) worst, O(1) best.
+class MinStack3 {
+public:
+    void push(int x) {
+        main.push_back(x);
+        if (aux.empty() || x <= aux.back()) aux.push_back(x);
+    }
+    void pop() {
+        if (main.back() == aux.back()) aux.pop_back();
+        main.pop_back();
+    }
+    int top() { return main.back(); }
+    int getMin() { return aux.back(); }
+private:
+    vector<int> main;
+    vector<int> aux;
+};
+
 int main() {
     struct Op { const char *name; int arg; };
     vector<Op> ops = {
@@ -59,22 +80,25 @@ int main() {
 
     MinStack ms1;
     MinStack2 ms2;
+    MinStack3 ms3;
 
     for (const auto &op : ops) {
         if (std::string(op.name) == "push") {
             ms1.push(op.arg);
             ms2.push(op.arg);
+            ms3.push(op.arg);
         } else if (std::string(op.name) == "pop") {
             ms1.pop();
             ms2.pop();
+            ms3.pop();
         } else if (std::string(op.name) == "top") {
-            int v1 = ms1.top(), v2 = ms2.top();
-            std::cout << "top: orig=" << v1 << " paired=" << v2
-                      << (v1 == v2 ? " OK" : " MISMATCH") << std::endl;
+            int v1 = ms1.top(), v2 = ms2.top(), v3 = ms3.top();
+            std::cout << "top: orig=" << v1 << " paired=" << v2 << " aux=" << v3
+                      << ((v1 == v2 && v2 == v3) ? " OK" : " MISMATCH") << std::endl;
         } else {
-            int v1 = ms1.getMin(), v2 = ms2.getMin();
-            std::cout << "getMin: orig=" << v1 << " paired=" << v2
-                      << (v1 == v2 ? " OK" : " MISMATCH") << std::endl;
+            int v1 = ms1.getMin(), v2 = ms2.getMin(), v3 = ms3.getMin();
+            std::cout << "getMin: orig=" << v1 << " paired=" << v2 << " aux=" << v3
+                      << ((v1 == v2 && v2 == v3) ? " OK" : " MISMATCH") << std::endl;
         }
     }
 
@@ -82,6 +106,6 @@ int main() {
 }
 
 // Complexity comparison:
-// MinStack  (linear scan): push O(1), pop O(1), top O(1), getMin O(n).
-// MinStack2 (paired):      push O(1), pop O(1), top O(1), getMin O(1).
-// Paired approach makes getMin constant at cost of storing an extra int per entry.
+// MinStack  (linear scan): push O(1), pop O(1), top O(1), getMin O(n).  Space O(n).
+// MinStack2 (paired):      push O(1), pop O(1), top O(1), getMin O(1).  Space O(n) always.
+// MinStack3 (aux-stack):   push O(1), pop O(1), top O(1), getMin O(1).  Space O(n) worst, O(1) best.
