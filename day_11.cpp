@@ -5,6 +5,7 @@
 #include <queue>
 #include <unordered_map>
 #include <algorithm>
+#include <stack>
 
 using std::vector;
 using std::map;
@@ -92,6 +93,42 @@ public:
     }
 };
 
+// Iterative post-order with explicit stack.
+// Avoids recursion by manually managing traversal state.
+// Time: O(n). Space: O(h) for stack + depth map.
+class Solution3 {
+public:
+    int diameterOfBinaryTree(TreeNode *root) {
+        if (!root) return 0;
+        std::stack<TreeNode*> stk;
+        std::unordered_map<TreeNode*, int> depth;
+        TreeNode *prev = nullptr;
+        int diameter = 0;
+        stk.push(root);
+        while (!stk.empty()) {
+            TreeNode *curr = stk.top();
+            bool goingDown = false;
+            if (curr->right && curr->right != prev && curr->left != prev) {
+                stk.push(curr->right);
+                goingDown = true;
+            }
+            if (curr->left && curr->left != prev && !goingDown) {
+                stk.push(curr->left);
+                goingDown = true;
+            }
+            if (!goingDown) {
+                stk.pop();
+                int ld = curr->left  ? depth[curr->left]  + 1 : 0;
+                int rd = curr->right ? depth[curr->right] + 1 : 0;
+                depth[curr] = std::max(ld, rd);
+                diameter = std::max(diameter, ld + rd);
+                prev = curr;
+            }
+        }
+        return diameter;
+    }
+};
+
 static TreeNode *buildTree(const map<int, pair<int,int>> &spec) {
     auto *root = new TreeNode(spec.begin()->first);
     for (const auto &elem : spec) {
@@ -114,6 +151,7 @@ static void freeTree(TreeNode *node) {
 int main() {
     Solution s1;
     Solution2 s2;
+    Solution3 s3;
 
     vector<map<int, pair<int,int>>> trees = {
         {{1, {2, 3}}, {2, {4, 5}}},
@@ -126,18 +164,22 @@ int main() {
     for (const auto &spec : trees) {
         auto *r1 = buildTree(spec);
         auto *r2 = buildTree(spec);
+        auto *r3 = buildTree(spec);
         int d1 = s1.diameterOfBinaryTree(r1);
         int d2 = s2.diameterOfBinaryTree(r2);
-        std::cout << "dfs=" << d1 << " bfs=" << d2
-                  << (d1 == d2 ? " OK" : " MISMATCH") << std::endl;
+        int d3 = s3.diameterOfBinaryTree(r3);
+        std::cout << "dfs=" << d1 << " bfs=" << d2 << " iter=" << d3
+                  << ((d1 == d2 && d2 == d3) ? " OK" : " MISMATCH") << std::endl;
         freeTree(r1);
         freeTree(r2);
+        freeTree(r3);
     }
 
     return 0;
 }
 
 // Complexity comparison:
-// Solution  (recursive DFS):         Time O(n), Space O(h) call-stack.
-// Solution2 (BFS + bottom-up map):   Time O(n), Space O(n) queue + map.
-// Both linear; DFS uses less memory on balanced trees (O(log n) stack vs O(n) map).
+// Solution  (recursive DFS):          Time O(n), Space O(h) call-stack.
+// Solution2 (BFS + bottom-up map):    Time O(n), Space O(n) queue + map.
+// Solution3 (iterative post-order):   Time O(n), Space O(h) stack + map.
+// All linear; iterative avoids recursion overhead while matching DFS memory.
