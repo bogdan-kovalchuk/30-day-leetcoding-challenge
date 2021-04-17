@@ -129,6 +129,27 @@ public:
     }
 };
 
+// Divide and conquer: return pair<depth, diameter>.
+// Each call returns both the height and best diameter in the subtree,
+// avoiding any side-effect reference parameter.
+// Time: O(n). Space: O(h) call-stack.
+class Solution4 {
+public:
+    int diameterOfBinaryTree(TreeNode *root) {
+        return solve(root).second;
+    }
+private:
+    std::pair<int,int> solve(TreeNode *node) {
+        if (!node) return {0, 0};
+        auto l = solve(node->left);
+        auto r = solve(node->right);
+        int depth = std::max(l.first, r.first) + 1;
+        int thru = l.first + r.first;
+        int diam = std::max({l.second, r.second, thru});
+        return {depth, diam};
+    }
+};
+
 static TreeNode *buildTree(const map<int, pair<int,int>> &spec) {
     auto *root = new TreeNode(spec.begin()->first);
     for (const auto &elem : spec) {
@@ -152,6 +173,7 @@ int main() {
     Solution s1;
     Solution2 s2;
     Solution3 s3;
+    Solution4 s4;
 
     vector<map<int, pair<int,int>>> trees = {
         {{1, {2, 3}}, {2, {4, 5}}},
@@ -165,14 +187,17 @@ int main() {
         auto *r1 = buildTree(spec);
         auto *r2 = buildTree(spec);
         auto *r3 = buildTree(spec);
+        auto *r4 = buildTree(spec);
         int d1 = s1.diameterOfBinaryTree(r1);
         int d2 = s2.diameterOfBinaryTree(r2);
         int d3 = s3.diameterOfBinaryTree(r3);
-        std::cout << "dfs=" << d1 << " bfs=" << d2 << " iter=" << d3
-                  << ((d1 == d2 && d2 == d3) ? " OK" : " MISMATCH") << std::endl;
+        int d4 = s4.diameterOfBinaryTree(r4);
+        std::cout << "dfs=" << d1 << " bfs=" << d2 << " iter=" << d3 << " pair=" << d4
+                  << ((d1 == d2 && d2 == d3 && d3 == d4) ? " OK" : " MISMATCH") << std::endl;
         freeTree(r1);
         freeTree(r2);
         freeTree(r3);
+        freeTree(r4);
     }
 
     return 0;
@@ -182,4 +207,5 @@ int main() {
 // Solution  (recursive DFS):          Time O(n), Space O(h) call-stack.
 // Solution2 (BFS + bottom-up map):    Time O(n), Space O(n) queue + map.
 // Solution3 (iterative post-order):   Time O(n), Space O(h) stack + map.
-// All linear; iterative avoids recursion overhead while matching DFS memory.
+// Solution4 (pair return):            Time O(n), Space O(h) call-stack.
+// All linear; pair-return is pure functional style with no side effects.
