@@ -65,10 +65,48 @@ public:
     }
 };
 
+// Counting sort / bucket: count occurrences of each weight (1..1000).
+// Scan from max weight down to find two heaviest, smash, update counts.
+// Time: O(W + n) where W = max weight. Space: O(W).
+class Solution4 {
+public:
+    int lastStoneWeight(vector<int> &stones) {
+        int count[1001] = {0};
+        int maxW = 0;
+        for (int s : stones) {
+            count[s]++;
+            if (s > maxW) maxW = s;
+        }
+        int remaining = static_cast<int>(stones.size());
+        while (remaining > 1) {
+            int a = 0, b = 0;
+            for (int w = maxW; w >= 1 && (a == 0 || b == 0); --w) {
+                while (count[w] > 0 && (a == 0 || b == 0)) {
+                    if (a == 0) a = w;
+                    else b = w;
+                    count[w]--;
+                    remaining--;
+                }
+            }
+            if (a != b) {
+                int diff = a - b;
+                count[diff]++;
+                remaining++;
+                if (diff > maxW) maxW = diff;
+            }
+        }
+        for (int w = maxW; w >= 1; --w) {
+            if (count[w] > 0) return w;
+        }
+        return 0;
+    }
+};
+
 int main() {
     Solution s1;
     Solution2 s2;
     Solution3 s3;
+    Solution4 s4;
 
     vector<vector<int>> cases = {
         {2, 7, 4, 1, 8, 1},
@@ -82,12 +120,13 @@ int main() {
     };
 
     for (const auto &nums : cases) {
-        auto v1 = nums, v2 = nums, v3 = nums;
+        auto v1 = nums, v2 = nums, v3 = nums, v4 = nums;
         int r1 = s1.lastStoneWeight(v1);
         int r2 = s2.lastStoneWeight(v2);
         int r3 = s3.lastStoneWeight(v3);
-        std::cout << "sort=" << r1 << " heap=" << r2 << " mset=" << r3
-                  << ((r1 == r2 && r2 == r3) ? " OK" : " MISMATCH") << std::endl;
+        int r4 = s4.lastStoneWeight(v4);
+        std::cout << "sort=" << r1 << " heap=" << r2 << " mset=" << r3 << " bucket=" << r4
+                  << ((r1 == r2 && r2 == r3 && r3 == r4) ? " OK" : " MISMATCH") << std::endl;
     }
 
     return 0;
@@ -97,4 +136,5 @@ int main() {
 // Solution  (sort + erase):   Time O(n^2 log n) worst, Space O(1) extra.
 // Solution2 (priority_queue): Time O(n log n),         Space O(n).
 // Solution3 (multiset):       Time O(n log n),         Space O(n).
-// Multiset gives automatic ordering; heap is faster in practice (contiguous memory).
+// Solution4 (counting):       Time O(W + n),           Space O(W).
+// Counting is fastest when weight range W is small relative to n.
