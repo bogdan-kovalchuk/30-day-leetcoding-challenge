@@ -102,11 +102,33 @@ public:
     }
 };
 
+// Insertion-sort style: maintain sorted vector (descending).
+// After smashing, insert remainder at correct position via binary search.
+// Time: O(n^2) due to shifts. Space: O(1) extra.
+class Solution5 {
+public:
+    int lastStoneWeight(vector<int> &stones) {
+        std::sort(stones.begin(), stones.end(), std::greater<int>());
+        while (stones.size() > 1) {
+            int a = stones[0];
+            int b = stones[1];
+            stones.erase(stones.begin(), stones.begin() + 2);
+            if (a != b) {
+                int diff = a - b;
+                auto pos = std::lower_bound(stones.begin(), stones.end(), diff, std::greater<int>());
+                stones.insert(pos, diff);
+            }
+        }
+        return stones.empty() ? 0 : stones[0];
+    }
+};
+
 int main() {
     Solution s1;
     Solution2 s2;
     Solution3 s3;
     Solution4 s4;
+    Solution5 s5;
 
     vector<vector<int>> cases = {
         {2, 7, 4, 1, 8, 1},
@@ -120,13 +142,15 @@ int main() {
     };
 
     for (const auto &nums : cases) {
-        auto v1 = nums, v2 = nums, v3 = nums, v4 = nums;
+        auto v1 = nums, v2 = nums, v3 = nums, v4 = nums, v5 = nums;
         int r1 = s1.lastStoneWeight(v1);
         int r2 = s2.lastStoneWeight(v2);
         int r3 = s3.lastStoneWeight(v3);
         int r4 = s4.lastStoneWeight(v4);
-        std::cout << "sort=" << r1 << " heap=" << r2 << " mset=" << r3 << " bucket=" << r4
-                  << ((r1 == r2 && r2 == r3 && r3 == r4) ? " OK" : " MISMATCH") << std::endl;
+        int r5 = s5.lastStoneWeight(v5);
+        std::cout << "sort=" << r1 << " heap=" << r2 << " mset=" << r3
+                  << " bucket=" << r4 << " insert=" << r5
+                  << ((r1 == r2 && r2 == r3 && r3 == r4 && r4 == r5) ? " OK" : " MISMATCH") << std::endl;
     }
 
     return 0;
@@ -137,4 +161,5 @@ int main() {
 // Solution2 (priority_queue): Time O(n log n),         Space O(n).
 // Solution3 (multiset):       Time O(n log n),         Space O(n).
 // Solution4 (counting):       Time O(W + n),           Space O(W).
-// Counting is fastest when weight range W is small relative to n.
+// Solution5 (insertion):      Time O(n^2),             Space O(1) extra.
+// Insertion avoids full re-sorts but still shifts elements on each insert.
