@@ -2,6 +2,8 @@
 #include <iostream>
 #include <numeric>
 #include <unordered_map>
+#include <queue>
+#include <algorithm>
 
 using std::vector;
 
@@ -29,14 +31,49 @@ public:
     }
 };
 
+// Max-heap: push all stones into priority_queue, pop two heaviest,
+// smash them, push remainder if nonzero. Repeat until 0 or 1 left.
+// Time: O(n log n). Space: O(n).
+class Solution2 {
+public:
+    int lastStoneWeight(vector<int> &stones) {
+        std::priority_queue<int> pq(stones.begin(), stones.end());
+        while (pq.size() > 1) {
+            int a = pq.top(); pq.pop();
+            int b = pq.top(); pq.pop();
+            if (a != b) pq.push(a - b);
+        }
+        return pq.empty() ? 0 : pq.top();
+    }
+};
+
 int main() {
-    Solution solution = Solution();
-    vector<int> nums = {2, 7, 4, 1, 8, 1};
-//    vector<int> nums = {2, 2};
+    Solution s1;
+    Solution2 s2;
 
-    int count = solution.lastStoneWeight(nums);
+    vector<vector<int>> cases = {
+        {2, 7, 4, 1, 8, 1},
+        {1},
+        {2, 2},
+        {1, 3},
+        {10, 4, 2, 10},
+        {1, 1, 1, 1},
+        {5, 5, 5, 5},
+        {3, 7, 2, 9},
+    };
 
-    std::cout << count << std::endl;
+    for (const auto &nums : cases) {
+        auto v1 = nums, v2 = nums;
+        int r1 = s1.lastStoneWeight(v1);
+        int r2 = s2.lastStoneWeight(v2);
+        std::cout << "sort=" << r1 << " heap=" << r2
+                  << (r1 == r2 ? " OK" : " MISMATCH") << std::endl;
+    }
 
     return 0;
 }
+
+// Complexity comparison:
+// Solution  (sort + erase):  Time O(n^2 log n) worst, Space O(1) extra.
+// Solution2 (priority_queue): Time O(n log n),         Space O(n).
+// Heap avoids repeated full re-sorts and element shifts.
