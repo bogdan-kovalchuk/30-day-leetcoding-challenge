@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <queue>
 #include <algorithm>
+#include <set>
 
 using std::vector;
 
@@ -47,9 +48,27 @@ public:
     }
 };
 
+// Multiset: keeps stones sorted. Extract two largest via rbegin,
+// erase them, insert difference if nonzero.
+// Time: O(n log n). Space: O(n).
+class Solution3 {
+public:
+    int lastStoneWeight(vector<int> &stones) {
+        std::multiset<int> ms(stones.begin(), stones.end());
+        while (ms.size() > 1) {
+            auto it = ms.rbegin();
+            int a = *it; ms.erase(std::next(it).base());
+            int b = *ms.rbegin(); ms.erase(std::next(ms.rbegin()).base());
+            if (a != b) ms.insert(a - b);
+        }
+        return ms.empty() ? 0 : *ms.begin();
+    }
+};
+
 int main() {
     Solution s1;
     Solution2 s2;
+    Solution3 s3;
 
     vector<vector<int>> cases = {
         {2, 7, 4, 1, 8, 1},
@@ -63,17 +82,19 @@ int main() {
     };
 
     for (const auto &nums : cases) {
-        auto v1 = nums, v2 = nums;
+        auto v1 = nums, v2 = nums, v3 = nums;
         int r1 = s1.lastStoneWeight(v1);
         int r2 = s2.lastStoneWeight(v2);
-        std::cout << "sort=" << r1 << " heap=" << r2
-                  << (r1 == r2 ? " OK" : " MISMATCH") << std::endl;
+        int r3 = s3.lastStoneWeight(v3);
+        std::cout << "sort=" << r1 << " heap=" << r2 << " mset=" << r3
+                  << ((r1 == r2 && r2 == r3) ? " OK" : " MISMATCH") << std::endl;
     }
 
     return 0;
 }
 
 // Complexity comparison:
-// Solution  (sort + erase):  Time O(n^2 log n) worst, Space O(1) extra.
+// Solution  (sort + erase):   Time O(n^2 log n) worst, Space O(1) extra.
 // Solution2 (priority_queue): Time O(n log n),         Space O(n).
-// Heap avoids repeated full re-sorts and element shifts.
+// Solution3 (multiset):       Time O(n log n),         Space O(n).
+// Multiset gives automatic ordering; heap is faster in practice (contiguous memory).
