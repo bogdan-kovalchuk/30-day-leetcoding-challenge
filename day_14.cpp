@@ -9,12 +9,13 @@ using std::string;
 class Solution {
 public:
     string stringShift(string s, vector<vector<int>> &shift) {
+        if (s.empty()) return s;
         int shift_count[2] = {0, 0};
         for (auto item : shift) {
             shift_count[item[0]] += item[1];
         }
         int direction = shift_count[0] > shift_count[1] ? 0 : 1;
-        int amount = (std::abs(shift_count[0] - shift_count[1])) % shift.size();
+        int amount = (std::abs(shift_count[0] - shift_count[1])) % s.size();
 
         if (direction == 0) {
             while (amount > 0){
@@ -36,11 +37,12 @@ public:
 class SolutionSubstr {
 public:
     string stringShift(string s, vector<vector<int>> &shift) {
+        if (s.empty()) return s;
         int net = 0;
         for (const auto &op : shift) {
             net += (op[0] == 0) ? -op[1] : op[1];
         }
-        int n = s.size();
+        int n = static_cast<int>(s.size());
         net = ((net % n) + n) % n;
         return s.substr(n - net) + s.substr(0, n - net);
     }
@@ -49,10 +51,12 @@ public:
 int main() {
     Solution orig;
     SolutionSubstr substr;
+    bool all_match = true;
 
     auto run = [&](string s, vector<vector<int>> shift, const char *label) {
         string r1 = orig.stringShift(s, shift);
         string r2 = substr.stringShift(s, shift);
+        all_match = all_match && (r1 == r2);
         std::cout << label << ": orig=" << r1 << " substr=" << r2
                   << (r1 == r2 ? " [match]" : " [MISMATCH]") << std::endl;
     };
@@ -66,8 +70,11 @@ int main() {
     run("test", {{0,1},{0,1},{0,1},{0,1}}, "multiple_left");
     run("abcd", {{1,1},{1,1},{1,1},{1,1}}, "full_right");
     run("ab", {{0,10},{1,10}}, "large_amounts");
+    run("abcdef", {{0,8}}, "operation_count_differs_from_length");
+    run("abcdef", {}, "no_operations");
+    run("", {{0,3},{1,1}}, "empty_string");
 
-    return 0;
+    return all_match ? 0 : 1;
 }
 
 // Complexity comparison:
