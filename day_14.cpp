@@ -65,6 +65,12 @@ int main() {
     run("a", {{0,5},{1,3}}, "single_char");
     run("test", {{0,1},{0,1},{0,1},{0,1}}, "multiple_left");
     run("abcd", {{1,1},{1,1},{1,1},{1,1}}, "full_right");
+    run("ab", {{0,10},{1,10}}, "large_amounts");
 
     return 0;
 }
+
+// Complexity comparison:
+// Solution       (iterative shift): Time O(n * amount), Space O(1).
+// SolutionSubstr (substring concat): Time O(n),          Space O(n).
+// Substring approach trades memory for linear time.
