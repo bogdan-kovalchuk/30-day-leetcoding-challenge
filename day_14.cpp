@@ -33,22 +33,38 @@ public:
     }
 };
 
+class SolutionSubstr {
+public:
+    string stringShift(string s, vector<vector<int>> &shift) {
+        int net = 0;
+        for (const auto &op : shift) {
+            net += (op[0] == 0) ? -op[1] : op[1];
+        }
+        int n = s.size();
+        net = ((net % n) + n) % n;
+        return s.substr(n - net) + s.substr(0, n - net);
+    }
+};
+
 int main() {
-    Solution solution = Solution();
+    Solution orig;
+    SolutionSubstr substr;
 
-//    string s = "abc";
-//    vector<vector<int>> shift = {{0,1},{1,2}};
-//    vector<vector<int>> shift = {{1, 1},
-//                                 {1, 1},
-//                                 {0, 2},
-//                                 {1, 3}};
+    auto run = [&](string s, vector<vector<int>> shift, const char *label) {
+        string r1 = orig.stringShift(s, shift);
+        string r2 = substr.stringShift(s, shift);
+        std::cout << label << ": orig=" << r1 << " substr=" << r2
+                  << (r1 == r2 ? " [match]" : " [MISMATCH]") << std::endl;
+    };
 
-    string s = "wpdhhcj";
-    vector<vector<int>> shift = {{0,7},{1,7},{1,0},{1,3},{0,3},{0,6},{1,2}};
-
-    string str = solution.stringShift(s, shift);
-
-    std::cout << str << std::endl;
+    run("wpdhhcj", {{0,7},{1,7},{1,0},{1,3},{0,3},{0,6},{1,2}}, "basic");
+    run("abc", {{0,1},{1,2}}, "simple");
+    run("abcdef", {{0,2},{1,1},{0,1},{1,0},{0,0},{1,2}}, "mixed");
+    run("abcdef", {{0,6}}, "full_rotation");
+    run("abcdef", {{0,0},{1,0}}, "zero_shift");
+    run("a", {{0,5},{1,3}}, "single_char");
+    run("test", {{0,1},{0,1},{0,1},{0,1}}, "multiple_left");
+    run("abcd", {{1,1},{1,1},{1,1},{1,1}}, "full_right");
 
     return 0;
 }
